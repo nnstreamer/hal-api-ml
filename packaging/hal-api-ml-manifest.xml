@@ -1,0 +1,8 @@
+<hal-api>
+	<manifest platform-version="10.0">
+		<hal-module>
+			<name>HAL_MODULE_ML</name>
+			<version>1.0</version>
+		</hal-module>
+	</manifest>
+</hal-api>

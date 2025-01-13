@@ -1,0 +1,13 @@
+# Package Information for pkg-config
+prefix=@PREFIX@
+exec_prefix=@EXEC_PREFIX@/hal
+libdir=@LIBDIR@/hal
+includedir=@INCLUDEDIR@/hal
+
+Name: @PROJECT_NAME@
+Description: @PROJECT_NAME@ interface
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -l@PROJECT_NAME@
+Cflags: -I${includedir}
+CXXflags: -I${includedir}
