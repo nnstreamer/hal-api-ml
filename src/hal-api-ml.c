@@ -243,7 +243,7 @@ static int _hal_ml_configure_instance(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  const GstTensorFilterProperties *prop;
+  const void *prop;
   hal_ml_param_get(param, "properties", (void **)&prop);
   return ml->funcs->configure_instance(ml->backend_private, prop);
 }
@@ -253,8 +253,8 @@ static int _hal_ml_invoke(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  const GstTensorMemory *input;
-  GstTensorMemory *output;
+  const void *input;
+  void *output;
   hal_ml_param_get(param, "input", (void **)&input);
   hal_ml_param_get(param, "output", (void **)&output);
   return ml->funcs->invoke(ml->backend_private, input, output);
@@ -265,9 +265,9 @@ static int _hal_ml_invoke_dynamic(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  GstTensorFilterProperties *prop;
-  const GstTensorMemory *input;
-  GstTensorMemory *output;
+  void *prop;
+  const void *input;
+  void *output;
   hal_ml_param_get(param, "properties", (void **)&prop);
   hal_ml_param_get(param, "input", (void **)&input);
   hal_ml_param_get(param, "output", (void **)&output);
@@ -279,7 +279,7 @@ static int _hal_ml_get_framework_info(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  GstTensorFilterFrameworkInfo *framework_info;
+  void *framework_info;
   hal_ml_param_get(param, "framework_info", (void **)&framework_info);
   return ml->funcs->get_framework_info(ml->backend_private, framework_info);
 }
@@ -289,13 +289,13 @@ static int _hal_ml_get_model_info(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  model_info_ops *ops;
-  GstTensorsInfo *in_info;
-  GstTensorsInfo *out_info;
-  hal_ml_param_get(param, "ops", (void **)&ops);
+  int *model_info_ops;
+  void *in_info;
+  void *out_info;
+  hal_ml_param_get(param, "ops", (void **)&model_info_ops);
   hal_ml_param_get(param, "in_info", (void **)&in_info);
   hal_ml_param_get(param, "out_info", (void **)&out_info);
-  return ml->funcs->get_model_info(ml->backend_private, *ops, in_info, out_info);
+  return ml->funcs->get_model_info(ml->backend_private, *model_info_ops, in_info, out_info);
 }
 
 static int _hal_ml_event_handler(hal_ml_h handle, hal_ml_param_h param) {
@@ -303,11 +303,11 @@ static int _hal_ml_event_handler(hal_ml_h handle, hal_ml_param_h param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  event_ops ops;
-  GstTensorFilterFrameworkEventData *data;
-  hal_ml_param_get(param, "ops", (void **)&ops);
+  int *event_ops;
+  void *data;
+  hal_ml_param_get(param, "ops", (void **)&event_ops);
   hal_ml_param_get(param, "data", (void **)&data);
-  return ml->funcs->event_handler(ml->backend_private, ops, data);
+  return ml->funcs->event_handler(ml->backend_private, *event_ops, data);
 }
 
 int hal_ml_request(hal_ml_h handle, const char *request_name, hal_ml_param_h param)
@@ -338,9 +338,7 @@ int hal_ml_request(hal_ml_h handle, const char *request_name, hal_ml_param_h par
 
 int hal_ml_request_invoke(hal_ml_h handle, const void *input, void *output)
 {
-  const GstTensorMemory *input_ = (const GstTensorMemory *) input;
-  GstTensorMemory *output_ = (GstTensorMemory *) output;
-
   hal_ml_s *ml = (hal_ml_s *) handle;
-  return ml->funcs->invoke(ml->backend_private, input_, output_);
+
+  return ml->funcs->invoke(ml->backend_private, input, output);
 }
