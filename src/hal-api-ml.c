@@ -1,4 +1,21 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/**
+ * HAL (Hardware Abstract Layer) API for ML
+ *
+ * Copyright (C) 2025 Yongjoo Ahn <yongjoo1.ahn@samsung.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * @file    hal-api-ml.c
+ * @date    15 Jan 2025
+ * @brief   HAL (Hardware Abstract Layer) API for ML
+ * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
+ * @see     https://github.com/nnstreamer/nnstremaer
+ * @bug     No known bugs except for NYI items
+ *
+ * @details
+ *  This HAL ML provides an interface for Tizen ML API (NNStreamer's tensor_filter subplugin)
+ *  to use hardware acceleration devices (NPU, ...).
+ */
 
 #include <glib.h>
 
@@ -7,21 +24,12 @@
 #include "hal-ml-interface.h"
 #include "hal-ml.h"
 
-#if defined(__TIZEN__)
 #include <dlog.h>
 #define LOG_TAG "HAL_ML"
 #define _D(fmt, args...)  SLOGD(fmt, ##args)
 #define _I(fmt, args...)  SLOGI(fmt, ##args)
 #define _W(fmt, args...)  SLOGW(fmt, ##args)
 #define _E(fmt, args...)  SLOGE(fmt, ##args)
-#else
-#include <glib.h>
-
-#define _D g_debug
-#define _I g_info
-#define _W g_warning
-#define _E g_critical
-#endif
 
 
 typedef struct _hal_ml_s {
