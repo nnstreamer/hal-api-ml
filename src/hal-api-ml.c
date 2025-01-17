@@ -230,7 +230,7 @@ int hal_ml_destroy (hal_ml_h handle)
   return HAL_ML_ERROR_NONE;
 }
 
-int _hal_ml_configure_instance(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_configure_instance(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
@@ -240,7 +240,7 @@ int _hal_ml_configure_instance(hal_ml_h handle, hal_ml_param_h param) {
   return ml->funcs->configure_instance(ml->backend_private, prop);
 }
 
-int _hal_ml_invoke(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_invoke(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
@@ -252,7 +252,7 @@ int _hal_ml_invoke(hal_ml_h handle, hal_ml_param_h param) {
   return ml->funcs->invoke(ml->backend_private, input, output);
 }
 
-int _hal_ml_invoke_dynamic(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_invoke_dynamic(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
@@ -266,7 +266,7 @@ int _hal_ml_invoke_dynamic(hal_ml_h handle, hal_ml_param_h param) {
   return ml->funcs->invoke_dynamic(ml->backend_private, prop, input, output);
 }
 
-int _hal_ml_get_framework_info(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_get_framework_info(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
@@ -276,7 +276,7 @@ int _hal_ml_get_framework_info(hal_ml_h handle, hal_ml_param_h param) {
   return ml->funcs->get_framework_info(ml->backend_private, framework_info);
 }
 
-int _hal_ml_get_model_info(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_get_model_info(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
@@ -290,7 +290,7 @@ int _hal_ml_get_model_info(hal_ml_h handle, hal_ml_param_h param) {
   return ml->funcs->get_model_info(ml->backend_private, *ops, in_info, out_info);
 }
 
-int _hal_ml_event_handler(hal_ml_h handle, hal_ml_param_h param) {
+static int _hal_ml_event_handler(hal_ml_h handle, hal_ml_param_h param) {
   if (!handle || !param) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
