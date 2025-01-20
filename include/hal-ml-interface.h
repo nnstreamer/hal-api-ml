@@ -9,7 +9,7 @@
  * @date    15 Jan 2025
  * @brief   HAL (Hardware Abstract Layer) interface API for ML
  * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
- * @see     https://github.com/nnstreamer/nnstremaer
+ * @see     https://github.com/nnstreamer/nnstreamer
  * @bug     No known bugs except for NYI items
  */
 

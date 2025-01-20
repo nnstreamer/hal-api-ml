@@ -9,7 +9,7 @@
  * @date    15 Jan 2025
  * @brief   Define types for HAL ML
  * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
- * @see     https://github.com/nnstreamer/nnstremaer
+ * @see     https://github.com/nnstreamer/nnstreamer
  * @bug     No known bugs except for NYI items
  */
 
@@ -46,7 +46,6 @@ typedef enum hal_ml_error {
 /**
  * @}
  */
-
 
 #ifdef __cplusplus
 }
