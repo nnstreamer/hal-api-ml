@@ -9,7 +9,7 @@
  * @date    15 Jan 2025
  * @brief   HAL (Hardware Abstract Layer) interface API for ML
  * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
- * @see     https://github.com/nnstreamer/nnstremaer
+ * @see     https://github.com/nnstreamer/nnstreamer
  * @bug     No known bugs except for NYI items
  *
  * @details
@@ -36,22 +36,22 @@ extern "C" {
  */
 typedef struct _hal_backend_ml_funcs {
   /**< Initialize HL backend handle */
-  int (*init)(void **backend_private);
+  int (*init) (void **backend_private);
   /**< Deinitialize HL backend handle */
-  int (*deinit)(void *backend_private);
+  int (*deinit) (void *backend_private);
 
   /**< Configure ml framework */
-  int (*configure_instance)(void *backend_private, const void *prop);
+  int (*configure_instance) (void *backend_private, const void *prop);
   /**< Invoke */
-  int (*invoke)(void *backend_private, const void *input, void *output);
+  int (*invoke) (void *backend_private, const void *input, void *output);
   /**< Invoke dynamic */
-  int (*invoke_dynamic)(void *backend_private, void *prop, const void *input, void *output);
+  int (*invoke_dynamic) (void *backend_private, void *prop, const void *input, void *output);
   /**< Get framework info */
-  int (*get_framework_info)(void *backend_private, void *framework_info);
+  int (*get_framework_info) (void *backend_private, void *framework_info);
   /**< Get model info */
-  int (*get_model_info)(void *backend_private, int ops, void *in_info, void *out_info);
+  int (*get_model_info) (void *backend_private, int ops, void *in_info, void *out_info);
   /**< Handle event */
-  int (*event_handler)(void *backend_private, int ops, void *data);
+  int (*event_handler) (void *backend_private, int ops, void *data);
 } hal_backend_ml_funcs;
 
 /**

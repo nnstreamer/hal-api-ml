@@ -9,12 +9,12 @@
  * @date    15 Jan 2025
  * @brief   HAL (Hardware Abstract Layer) API for ML
  * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
- * @see     https://github.com/nnstreamer/nnstremaer
+ * @see     https://github.com/nnstreamer/nnstreamer
  * @bug     No known bugs except for NYI items
  *
  * @details
- *  This HAL ML provides an interface for Tizen ML API (NNStreamer's tensor_filter subplugin)
- *  to use hardware acceleration devices (NPU, ...).
+ *  This HAL ML provides an interface for Tizen ML API (NNStreamer's
+ * tensor_filter subplugin) to use hardware acceleration devices (NPU, ...).
  */
 
 #ifndef __HAL_ML__
@@ -47,13 +47,13 @@ typedef void *hal_ml_param_h;
  * @brief Creates hal-ml-param instance
  * @since HAL_MODULE_ML 1.0
  * @remarks The @a param should be released using hal_ml_param_destroy().
- * @param[out] option Newly created option handle is returned.
+ * @param[out] param Newly created param handle is returned.
  * @return @c 0 on success. Otherwise a negative error value.
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  * @retval #HAL_ML_ERROR_OUT_OF_MEMORY Failed to allocate required memory.
  */
-int hal_ml_param_create(hal_ml_param_h *param);
+int hal_ml_param_create (hal_ml_param_h *param);
 
 /**
  * @brief Destroys hal-ml-param instance
@@ -63,7 +63,7 @@ int hal_ml_param_create(hal_ml_param_h *param);
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_param_destroy(hal_ml_param_h param);
+int hal_ml_param_destroy (hal_ml_param_h param);
 
 /**
  * @brief Sets a parameter for hal-ml-param instance
@@ -75,7 +75,7 @@ int hal_ml_param_destroy(hal_ml_param_h param);
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_param_set(hal_ml_param_h param, const char *key, void *value);
+int hal_ml_param_set (hal_ml_param_h param, const char *key, void *value);
 
 /**
  * @brief Creates hal-ml instance
@@ -88,7 +88,7 @@ int hal_ml_param_set(hal_ml_param_h param, const char *key, void *value);
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  * @retval #HAL_ML_ERROR_OUT_OF_MEMORY Failed to allocate required memory.
  */
-int hal_ml_create(const char *backend_name, hal_ml_h *handle);
+int hal_ml_create (const char *backend_name, hal_ml_h *handle);
 
 /**
  * @brief Destroys hal-ml instance
@@ -98,7 +98,7 @@ int hal_ml_create(const char *backend_name, hal_ml_h *handle);
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_destroy(hal_ml_h handle);
+int hal_ml_destroy (hal_ml_h handle);
 
 /**
  * @brief Sends a request to hal-ml instance
@@ -110,7 +110,7 @@ int hal_ml_destroy(hal_ml_h handle);
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_request(hal_ml_h handle, const char *request_name, hal_ml_param_h param);
+int hal_ml_request (hal_ml_h handle, const char *request_name, hal_ml_param_h param);
 
 /**
  * @brief Invokes the hal-ml instance with the given data.
@@ -122,10 +122,10 @@ int hal_ml_request(hal_ml_h handle, const char *request_name, hal_ml_param_h par
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_request_invoke(hal_ml_h handle, const void *input, void *output);
+int hal_ml_request_invoke (hal_ml_h handle, const void *input, void *output);
 
 /**
- * @brief Invoke dynamic the hal-ml instance with the given data.
+ * @brief Invokes the hal-ml instance dynamically with the given data.
  * @since HAL_MODULE_ML 1.0
  * @param[in] handle The handle of the instance.
  * @param[in, out] prop The properties for the invoke dynamic.
@@ -135,7 +135,7 @@ int hal_ml_request_invoke(hal_ml_h handle, const void *input, void *output);
  * @retval #HAL_ML_ERROR_NONE Successful.
  * @retval #HAL_ML_ERROR_INVALID_PARAMETER Fail. The parameter is invalid.
  */
-int hal_ml_request_invoke_dynamic(hal_ml_h handle, void *prop, const void *input, void *output);
+int hal_ml_request_invoke_dynamic (hal_ml_h handle, void *prop, const void *input, void *output);
 
 /**
  * @}
