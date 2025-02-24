@@ -23,7 +23,10 @@
 #include "hal-ml-interface.h"
 #include "hal-ml.h"
 
-#define LOG_TAG "HAL_ML"
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
+#define LOG_TAG "HAL_API_ML"
 #define _D(fmt, args...) SLOGD (fmt, ##args)
 #define _I(fmt, args...) SLOGI (fmt, ##args)
 #define _W(fmt, args...) SLOGW (fmt, ##args)
@@ -65,21 +68,20 @@ static char **hal_ml_backend_names = NULL;
 static int
 hal_ml_scan_backends (void)
 {
-  int i;
   _D ("Scanning available HAL ML backends...");
 
   hal_ml_backend_count = hal_common_get_backend_count (HAL_MODULE_ML);
   _D ("hal_ml_backend_count: %d", hal_ml_backend_count);
 
   hal_ml_backend_names = (char **) malloc (sizeof (char *) * hal_ml_backend_count);
-  for (i = 0; i < hal_ml_backend_count; i++) {
+  for (int i = 0; i < hal_ml_backend_count; i++) {
     hal_ml_backend_names[i] = (char *) malloc (sizeof (char) * MAX_LIB_NAME_LENGTH);
   }
 
   hal_common_get_backend_library_names (HAL_MODULE_ML, hal_ml_backend_names,
       hal_ml_backend_count, MAX_LIB_NAME_LENGTH);
 
-  for (i = 0; i < hal_ml_backend_count; i++) {
+  for (int i = 0; i < hal_ml_backend_count; i++) {
     _D ("hal_ml_backend_names[%d]: %s", i, hal_ml_backend_names[i]);
   }
 
@@ -164,8 +166,6 @@ hal_ml_param_get (hal_ml_param_h param, const char *key, void **value)
 int
 hal_ml_create (const char *backend_name, hal_ml_h *handle)
 {
-  int i;
-
   /* Scan backend only once */
   static int scanned = 1;
   if (scanned == 1) {
@@ -175,7 +175,7 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
   _I ("Initializing backend %s", backend_name);
 
   /* Find matched backend */
-  for (i = 0; i < hal_ml_backend_count; i++) {
+  for (int i = 0; i < hal_ml_backend_count; i++) {
     if (g_strrstr (hal_ml_backend_names[i], backend_name) != NULL) {
       hal_ml_s *new_handle = g_new0 (hal_ml_s, 1);
       if (!new_handle) {
@@ -219,10 +219,12 @@ int
 hal_ml_destroy (hal_ml_h handle)
 {
   hal_ml_s *ml = (hal_ml_s *) handle;
-
   _I ("Deinitializing backend %s", ml->backend_library_name);
 
   int ret = ml->funcs->deinit (ml->backend_private);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _W ("Failed to deinitialize backend.");
+  }
 
   ret = hal_common_put_backend_with_library_name_v2 (HAL_MODULE_ML,
       (void *) ml->funcs, NULL, hal_ml_exit_backend, ml->backend_library_name);
@@ -239,11 +241,8 @@ hal_ml_destroy (hal_ml_h handle)
 static int
 _hal_ml_configure_instance (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  const void *prop;
+  const void *prop = NULL;
   hal_ml_param_get (param, "properties", (void **) &prop);
   return ml->funcs->configure_instance (ml->backend_private, prop);
 }
@@ -251,12 +250,9 @@ _hal_ml_configure_instance (hal_ml_h handle, hal_ml_param_h param)
 static int
 _hal_ml_invoke (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  const void *input;
-  void *output;
+  const void *input = NULL;
+  void *output = NULL;
   hal_ml_param_get (param, "input", (void **) &input);
   hal_ml_param_get (param, "output", (void **) &output);
   return ml->funcs->invoke (ml->backend_private, input, output);
@@ -265,13 +261,10 @@ _hal_ml_invoke (hal_ml_h handle, hal_ml_param_h param)
 static int
 _hal_ml_invoke_dynamic (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  void *prop;
-  const void *input;
-  void *output;
+  void *prop = NULL;
+  const void *input = NULL;
+  void *output = NULL;
   hal_ml_param_get (param, "properties", (void **) &prop);
   hal_ml_param_get (param, "input", (void **) &input);
   hal_ml_param_get (param, "output", (void **) &output);
@@ -281,11 +274,8 @@ _hal_ml_invoke_dynamic (hal_ml_h handle, hal_ml_param_h param)
 static int
 _hal_ml_get_framework_info (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  void *framework_info;
+  void *framework_info = NULL;
   hal_ml_param_get (param, "framework_info", (void **) &framework_info);
   return ml->funcs->get_framework_info (ml->backend_private, framework_info);
 }
@@ -293,13 +283,10 @@ _hal_ml_get_framework_info (hal_ml_h handle, hal_ml_param_h param)
 static int
 _hal_ml_get_model_info (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  int *model_info_ops;
-  void *in_info;
-  void *out_info;
+  int *model_info_ops = NULL;
+  void *in_info = NULL;
+  void *out_info = NULL;
   hal_ml_param_get (param, "ops", (void **) &model_info_ops);
   hal_ml_param_get (param, "in_info", (void **) &in_info);
   hal_ml_param_get (param, "out_info", (void **) &out_info);
@@ -309,12 +296,9 @@ _hal_ml_get_model_info (hal_ml_h handle, hal_ml_param_h param)
 static int
 _hal_ml_event_handler (hal_ml_h handle, hal_ml_param_h param)
 {
-  if (!handle || !param) {
-    return HAL_ML_ERROR_INVALID_PARAMETER;
-  }
   hal_ml_s *ml = (hal_ml_s *) handle;
-  int *event_ops;
-  void *data;
+  int *event_ops = NULL;
+  void *data = NULL;
   hal_ml_param_get (param, "ops", (void **) &event_ops);
   hal_ml_param_get (param, "data", (void **) &data);
   return ml->funcs->event_handler (ml->backend_private, *event_ops, data);
@@ -323,6 +307,11 @@ _hal_ml_event_handler (hal_ml_h handle, hal_ml_param_h param)
 int
 hal_ml_request (hal_ml_h handle, const char *request_name, hal_ml_param_h param)
 {
+  if (!handle || !param) {
+    _E ("Got invalid parameter");
+    return HAL_ML_ERROR_INVALID_PARAMETER;
+  }
+
   if (g_ascii_strcasecmp (request_name, "configure_instance") == 0)
     return _hal_ml_configure_instance (handle, param);
 
@@ -349,5 +338,10 @@ int
 hal_ml_request_invoke (hal_ml_h handle, const void *input, void *output)
 {
   hal_ml_s *ml = (hal_ml_s *) handle;
+  if (G_UNLIKELY (!handle)) {
+    _E ("Got invalid handle");
+    return HAL_ML_ERROR_INVALID_PARAMETER;
+  }
+
   return ml->funcs->invoke (ml->backend_private, input, output);
 }
