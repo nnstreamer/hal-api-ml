@@ -24,7 +24,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @addtogroup HAL_ML_MODULE
+ * @addtogroup HALAPI_HAL_ML_MODULE
  * @{
  */
 
@@ -33,14 +33,14 @@ extern "C" {
  * @since HAL_MODULE_ML 1.0
  */
 typedef enum hal_ml_error {
-  HAL_ML_ERROR_NONE = 0,
-  HAL_ML_ERROR_INVALID_PARAMETER = -1,
-  HAL_ML_ERROR_NOT_SUPPORTED = -2,
-  HAL_ML_ERROR_UNKNOWN = -3,
-  HAL_ML_ERROR_OUT_OF_MEMORY = -4,
-  HAL_ML_ERROR_PERMISSION_DENIED = -5,
-  HAL_ML_ERROR_IO_ERROR = -6,
-  HAL_ML_ERROR_RUNTIME_ERROR = -7,
+  HAL_ML_ERROR_NONE = 0,                  /**< Success! */
+  HAL_ML_ERROR_INVALID_PARAMETER = -1,    /**< Invalid parameter */
+  HAL_ML_ERROR_NOT_SUPPORTED = -2,        /**< The feature is not supported */
+  HAL_ML_ERROR_UNKNOWN = -3,              /**< Unknown error */
+  HAL_ML_ERROR_OUT_OF_MEMORY = -4,        /**< Out of memory */
+  HAL_ML_ERROR_PERMISSION_DENIED = -5,    /**< Permission denied */
+  HAL_ML_ERROR_IO_ERROR = -6,             /**< I/O error */
+  HAL_ML_ERROR_RUNTIME_ERROR = -7,        /**< Runtime error */
 } hal_ml_error_e;
 
 /**
