@@ -166,6 +166,16 @@ hal_ml_param_get (hal_ml_param_h param, const char *key, void **value)
 int
 hal_ml_create (const char *backend_name, hal_ml_h *handle)
 {
+  if (!handle) {
+    _E ("Got invalid handle");
+    return HAL_ML_ERROR_INVALID_PARAMETER;
+  }
+
+  if (!backend_name) {
+    _E ("Got invalid backend name");
+    return HAL_ML_ERROR_INVALID_PARAMETER;
+  }
+
   /* Scan backend only once */
   static int scanned = 1;
   if (scanned == 1) {
@@ -219,6 +229,12 @@ int
 hal_ml_destroy (hal_ml_h handle)
 {
   hal_ml_s *ml = (hal_ml_s *) handle;
+
+  if (!handle) {
+    _E ("Got invalid handle");
+    return HAL_ML_ERROR_INVALID_PARAMETER;
+  }
+
   _I ("Deinitializing backend %s", ml->backend_library_name);
 
   int ret = ml->funcs->deinit (ml->backend_private);
