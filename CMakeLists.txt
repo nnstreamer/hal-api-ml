@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(hal-api-ml)
 
+option(ENABLE_HALTESTS "Enable HAL tests" ON)
+
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
 SET(EXEC_PREFIX "${CMAKE_INSTALL_PREFIX}/bin")
 SET(INCLUDEDIR "${CMAKE_INSTALL_PREFIX}/include")
@@ -51,3 +53,22 @@ INSTALL(DIRECTORY include/ DESTINATION include/hal
 		PATTERN "include/*.hh")
 
 INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc DESTINATION ${LIBDIR}/pkgconfig)
+
+IF(ENABLE_HALTESTS)
+SET(HALTESTS_SRCS
+	tests/ml-haltests.cc
+)
+
+pkg_check_modules(ml_hal_tests_dep_pkgs REQUIRED
+	gtest
+)
+
+ADD_EXECUTABLE(ml-haltests ${HALTESTS_SRCS})
+TARGET_LINK_LIBRARIES(ml-haltests
+	${PROJECT_NAME}
+	${pkgs_LDFLAGS}
+	${ml_hal_tests_dep_pkgs_LDFLAGS}
+)
+
+INSTALL(TARGETS ml-haltests DESTINATION /usr/bin/hal)
+ENDIF()
