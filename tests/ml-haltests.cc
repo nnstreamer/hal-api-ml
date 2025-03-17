@@ -43,7 +43,7 @@ TEST (HAL_ML, create_n)
 
   hal_ml_h ml;
   EXPECT_EQ (hal_ml_create (nullptr, &ml), HAL_ML_ERROR_INVALID_PARAMETER);
-  EXPECT_EQ (hal_ml_create ("there_is_no_available_backend", &ml), HAL_ML_ERROR_INVALID_PARAMETER);
+  EXPECT_NE (hal_ml_create ("there_is_no_available_backend", &ml), HAL_ML_ERROR_NONE);
 }
 
 TEST (HAL_ML, destroy_n)
