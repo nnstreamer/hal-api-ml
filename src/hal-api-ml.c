@@ -71,6 +71,15 @@ hal_ml_scan_backends (void)
   _D ("Scanning available HAL ML backends...");
 
   hal_ml_backend_count = hal_common_get_backend_count (HAL_MODULE_ML);
+  if (hal_ml_backend_count < 0) {
+    _E ("Failed to get backend count");
+    return -1;
+  }
+
+  if (hal_ml_backend_count == 0) {
+    return 0;
+  }
+
   _D ("hal_ml_backend_count: %d", hal_ml_backend_count);
 
   hal_ml_backend_names = (char **) malloc (sizeof (char *) * hal_ml_backend_count);
@@ -180,6 +189,15 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
   static int scanned = 1;
   if (scanned == 1) {
     scanned = hal_ml_scan_backends ();
+    if (scanned < 0) {
+      _E ("Failed to scan backends");
+      return HAL_ML_ERROR_RUNTIME_ERROR;
+    }
+  }
+
+  if (hal_ml_backend_count == 0) {
+    _E ("There is no available backends");
+    return HAL_ML_ERROR_NOT_SUPPORTED;
   }
 
   _I ("Initializing backend %s", backend_name);
