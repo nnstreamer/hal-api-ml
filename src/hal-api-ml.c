@@ -61,7 +61,7 @@ hal_ml_exit_backend (void *data, void *user_data)
 }
 
 static int hal_ml_backend_count = 0;
-static char **hal_ml_backend_names = NULL;
+static gchar **hal_ml_backend_names = NULL;
 
 #define MAX_LIB_NAME_LENGTH 256
 
@@ -69,6 +69,11 @@ static int
 hal_ml_scan_backends (void)
 {
   _D ("Scanning available HAL ML backends...");
+
+  if (hal_ml_backend_names) {
+    _W ("Rescan HAL ML backends, internal error?");
+    g_clear_pointer (&hal_ml_backend_names, g_strfreev);
+  }
 
   hal_ml_backend_count = hal_common_get_backend_count (HAL_MODULE_ML);
   if (hal_ml_backend_count < 0) {
@@ -82,9 +87,9 @@ hal_ml_scan_backends (void)
 
   _D ("hal_ml_backend_count: %d", hal_ml_backend_count);
 
-  hal_ml_backend_names = (char **) malloc (sizeof (char *) * hal_ml_backend_count);
+  hal_ml_backend_names = g_new0 (gchar*, hal_ml_backend_count + 1);
   for (int i = 0; i < hal_ml_backend_count; i++) {
-    hal_ml_backend_names[i] = (char *) malloc (sizeof (char) * MAX_LIB_NAME_LENGTH);
+    hal_ml_backend_names[i] = g_new0 (gchar, MAX_LIB_NAME_LENGTH);
   }
 
   hal_common_get_backend_library_names (HAL_MODULE_ML, hal_ml_backend_names,
@@ -205,17 +210,16 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
   /* Find matched backend */
   for (int i = 0; i < hal_ml_backend_count; i++) {
     if (g_strrstr (hal_ml_backend_names[i], backend_name) != NULL) {
+      gchar *backend_lib_name = hal_ml_backend_names[i];
       hal_ml_s *new_handle = g_new0 (hal_ml_s, 1);
       if (!new_handle) {
         return HAL_ML_ERROR_OUT_OF_MEMORY;
       }
 
-      new_handle->backend_library_name = hal_ml_backend_names[i];
-
       /* Fill function pointers from backend */
       int ret = hal_common_get_backend_with_library_name_v2 (HAL_MODULE_ML,
           (void **) &new_handle->funcs, NULL, hal_ml_create_backend,
-          new_handle->backend_library_name);
+          backend_lib_name);
 
       if (ret != 0 || !new_handle->funcs || !new_handle->funcs->init) {
         _E ("Failed to get backend");
@@ -229,13 +233,15 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
         _E ("Failed to initialize backend.");
         hal_common_put_backend_with_library_name_v2 (HAL_MODULE_ML,
             (void *) new_handle->funcs, NULL, hal_ml_exit_backend,
-            new_handle->backend_library_name);
+            backend_lib_name);
+        g_free (new_handle);
         return HAL_ML_ERROR_RUNTIME_ERROR;
       }
 
-      _I ("Backend initialized successfully with %s", new_handle->backend_library_name);
+      _I ("Backend initialized successfully with %s", backend_lib_name);
+      new_handle->backend_library_name = g_strdup (backend_lib_name);
       *handle = (hal_ml_h) new_handle;
-      return ret;
+      return HAL_ML_ERROR_NONE;
     }
   }
 
@@ -263,6 +269,7 @@ hal_ml_destroy (hal_ml_h handle)
   ret = hal_common_put_backend_with_library_name_v2 (HAL_MODULE_ML,
       (void *) ml->funcs, NULL, hal_ml_exit_backend, ml->backend_library_name);
 
+  g_free (ml->backend_library_name);
   g_free (ml);
 
   if (ret != 0) {
