@@ -169,7 +169,7 @@ hal_ml_param_get (hal_ml_param_h param, const char *key, void **value)
   hal_ml_param_s *param_s = (hal_ml_param_s *) param;
   hal_ml_param_value_s *param_value
       = (hal_ml_param_value_s *) g_hash_table_lookup (param_s->table, key);
-  if (!param_value) {
+  if (!param_value || !param_value->value) {
     return HAL_ML_ERROR_INVALID_PARAMETER;
   }
 
@@ -229,13 +229,13 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
 
       /* Initialize backend */
       ret = new_handle->funcs->init (&new_handle->backend_private);
-      if (ret != 0) {
+      if (ret != HAL_ML_ERROR_NONE) {
         _E ("Failed to initialize backend.");
         hal_common_put_backend_with_library_name_v2 (HAL_MODULE_ML,
             (void *) new_handle->funcs, NULL, hal_ml_exit_backend,
             backend_lib_name);
         g_free (new_handle);
-        return HAL_ML_ERROR_RUNTIME_ERROR;
+        return ret;
       }
 
       _I ("Backend initialized successfully with %s", backend_lib_name);
@@ -284,7 +284,14 @@ _hal_ml_configure_instance (hal_ml_h handle, hal_ml_param_h param)
 {
   hal_ml_s *ml = (hal_ml_s *) handle;
   const void *prop = NULL;
-  hal_ml_param_get (param, "properties", (void **) &prop);
+  int ret;
+
+  ret = hal_ml_param_get (param, "properties", (void **) &prop);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'properties'.");
+    return ret;
+  }
+
   return ml->funcs->configure_instance (ml->backend_private, prop);
 }
 
@@ -294,8 +301,20 @@ _hal_ml_invoke (hal_ml_h handle, hal_ml_param_h param)
   hal_ml_s *ml = (hal_ml_s *) handle;
   const void *input = NULL;
   void *output = NULL;
-  hal_ml_param_get (param, "input", (void **) &input);
-  hal_ml_param_get (param, "output", (void **) &output);
+  int ret;
+
+  ret = hal_ml_param_get (param, "input", (void **) &input);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'input'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "output", (void **) &output);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'output'.");
+    return ret;
+  }
+
   return ml->funcs->invoke (ml->backend_private, input, output);
 }
 
@@ -306,9 +325,26 @@ _hal_ml_invoke_dynamic (hal_ml_h handle, hal_ml_param_h param)
   void *prop = NULL;
   const void *input = NULL;
   void *output = NULL;
-  hal_ml_param_get (param, "properties", (void **) &prop);
-  hal_ml_param_get (param, "input", (void **) &input);
-  hal_ml_param_get (param, "output", (void **) &output);
+  int ret;
+
+  ret = hal_ml_param_get (param, "properties", (void **) &prop);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'properties'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "input", (void **) &input);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'input'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "output", (void **) &output);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'output'.");
+    return ret;
+  }
+
   return ml->funcs->invoke_dynamic (ml->backend_private, prop, input, output);
 }
 
@@ -317,7 +353,14 @@ _hal_ml_get_framework_info (hal_ml_h handle, hal_ml_param_h param)
 {
   hal_ml_s *ml = (hal_ml_s *) handle;
   void *framework_info = NULL;
-  hal_ml_param_get (param, "framework_info", (void **) &framework_info);
+  int ret;
+
+  ret = hal_ml_param_get (param, "framework_info", (void **) &framework_info);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'framework_info'.");
+    return ret;
+  }
+
   return ml->funcs->get_framework_info (ml->backend_private, framework_info);
 }
 
@@ -328,9 +371,26 @@ _hal_ml_get_model_info (hal_ml_h handle, hal_ml_param_h param)
   int *model_info_ops = NULL;
   void *in_info = NULL;
   void *out_info = NULL;
-  hal_ml_param_get (param, "ops", (void **) &model_info_ops);
-  hal_ml_param_get (param, "in_info", (void **) &in_info);
-  hal_ml_param_get (param, "out_info", (void **) &out_info);
+  int ret;
+
+  ret = hal_ml_param_get (param, "ops", (void **) &model_info_ops);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'ops'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "in_info", (void **) &in_info);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'in_info'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "out_info", (void **) &out_info);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'out_info'.");
+    return ret;
+  }
+
   return ml->funcs->get_model_info (ml->backend_private, *model_info_ops, in_info, out_info);
 }
 
@@ -340,8 +400,20 @@ _hal_ml_event_handler (hal_ml_h handle, hal_ml_param_h param)
   hal_ml_s *ml = (hal_ml_s *) handle;
   int *event_ops = NULL;
   void *data = NULL;
-  hal_ml_param_get (param, "ops", (void **) &event_ops);
-  hal_ml_param_get (param, "data", (void **) &data);
+  int ret;
+
+  ret = hal_ml_param_get (param, "ops", (void **) &event_ops);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'ops'.");
+    return ret;
+  }
+
+  ret = hal_ml_param_get (param, "data", (void **) &data);
+  if (ret != HAL_ML_ERROR_NONE) {
+    _E ("Failed to retrieve the param 'data'.");
+    return ret;
+  }
+
   return ml->funcs->event_handler (ml->backend_private, *event_ops, data);
 }
 
