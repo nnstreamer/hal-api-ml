@@ -1,18 +1,18 @@
 /**
- * High level documentation of the HAL ML
+ * High level documentation of the HAL Machine Learning
  * Copyright (C) 2025 Yongjoo Ahn <yongjoo1.ahn@samsung.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
  * @file    hal_ml_doc.h
  * @date    15 Jan 2025
- * @brief   High level documentation of the HAL ML
+ * @brief   High level documentation of the HAL Machine Learning
  * @author  Yongjoo Ahn <yongjoo1.ahn@samsung.com>
  * @see     https://github.com/nnstreamer/nnstremaer
  * @bug     No known bugs except for NYI items
  *
  * @details
- *    This file contains high level documentation of the HAL ML.
+ *    This file contains high level documentation of the HAL Machine Learning.
  */
 
 #ifndef __TIZEN_HAL_ML_DOC_H__
@@ -20,7 +20,7 @@
 
 
 /**
- * @defgroup HALAPI_HAL_ML_MODULE ML
+ * @defgroup HALAPI_HAL_ML_MODULE Machine Learning
  * @brief The @ref HALAPI_HAL_ML_MODULE provides functions for ml.
  *
  * @section HALAPI_HAL_ML_MODULE_HEADER Required Header
