@@ -246,7 +246,7 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
   }
 
   _E ("No backend matched with %s", backend_name);
-  return HAL_ML_ERROR_INVALID_PARAMETER;
+  return HAL_ML_ERROR_NOT_SUPPORTED;
 }
 
 int
