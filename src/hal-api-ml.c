@@ -62,6 +62,36 @@ hal_ml_exit_backend (void *data, void *user_data)
 
 static int hal_ml_backend_count = 0;
 static gchar **hal_ml_backend_names = NULL;
+static GHashTable *hal_ml_cached_backends = NULL;
+G_LOCK_DEFINE_STATIC (hal_ml_cached_backends_lock);
+
+/**
+ * @brief Destructor to clean up global resources when the library is unloaded.
+ */
+static void __attribute__ ((destructor))
+hal_ml_cleanup_global (void)
+{
+  if (hal_ml_cached_backends) {
+    GHashTableIter iter;
+    gpointer key, value;
+
+    g_hash_table_iter_init (&iter, hal_ml_cached_backends);
+    while (g_hash_table_iter_next (&iter, &key, &value)) {
+      hal_backend_ml_funcs *funcs = (hal_backend_ml_funcs *) value;
+      gchar *lib_name = (gchar *) key;
+
+      hal_common_put_backend_with_library_name_v2 (HAL_MODULE_ML,
+          (void *) funcs, NULL, hal_ml_exit_backend, lib_name);
+    }
+    g_hash_table_destroy (hal_ml_cached_backends);
+    hal_ml_cached_backends = NULL;
+  }
+
+  if (hal_ml_backend_names) {
+    g_clear_pointer (&hal_ml_backend_names, g_strfreev);
+    hal_ml_backend_count = 0;
+  }
+}
 
 #define MAX_LIB_NAME_LENGTH 256
 
@@ -211,6 +241,29 @@ hal_ml_create (const char *backend_name, hal_ml_h *handle)
   for (int i = 0; i < hal_ml_backend_count; i++) {
     if (g_strrstr (hal_ml_backend_names[i], backend_name) != NULL) {
       gchar *backend_lib_name = hal_ml_backend_names[i];
+
+      G_LOCK (hal_ml_cached_backends_lock);
+      if (!hal_ml_cached_backends) {
+        hal_ml_cached_backends
+            = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+      }
+
+      if (!g_hash_table_lookup (hal_ml_cached_backends, backend_lib_name)) {
+        hal_backend_ml_funcs *cached_funcs = NULL;
+        int ret = hal_common_get_backend_with_library_name_v2 (HAL_MODULE_ML,
+            (void **) &cached_funcs, NULL, hal_ml_create_backend,
+            backend_lib_name);
+
+        if (ret == 0 && cached_funcs) {
+          _I ("Backend %s cached.", backend_lib_name);
+          g_hash_table_insert (hal_ml_cached_backends,
+              g_strdup (backend_lib_name), cached_funcs);
+        } else {
+          _W ("Failed to cache backend %s", backend_lib_name);
+        }
+      }
+      G_UNLOCK (hal_ml_cached_backends_lock);
+
       hal_ml_s *new_handle = g_new0 (hal_ml_s, 1);
       if (!new_handle) {
         return HAL_ML_ERROR_OUT_OF_MEMORY;
