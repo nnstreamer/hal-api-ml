@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gbs_build_arch: [ x86_64, armv7l, aarch64, riscv64 ]
+        gbs_build_arch: [ x86_64, armv7l, aarch64 ] # Disable riscv64. Snapshots for riscv64 are not available now.
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
