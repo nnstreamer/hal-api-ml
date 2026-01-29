@@ -44,7 +44,7 @@ hal-api-ml tests package
 %prep
 %setup -q
 
-%cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_LIBDIR_PREFIX=%{_libdir} -DENABLE_HALTESTS=ON
+%cmake . -DCMAKE_C_COMPILER=%__cc -DCMAKE_CXX_COMPILER=%__cxx -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_LIBDIR_PREFIX=%{_libdir} -DENABLE_HALTESTS=ON
 
 %build
 cp %{SOURCE1} .
